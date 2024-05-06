@@ -1,0 +1,51 @@
+FROM nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get -y update
+
+RUN apt-get install -y \
+ build-essential \
+ cmake \
+ ninja-build \
+ git \
+ wget \
+ rsync \
+ ffmpeg \
+ htop \
+ nano \
+ libatlas-base-dev \
+ libboost-all-dev \
+ libeigen3-dev \
+ libhdf5-serial-dev \
+ libleveldb-dev \
+ liblmdb-dev \
+ libopenblas-dev \
+ libopenblas-base \
+ libsm6 \
+ libxext6 \
+ libxrender-dev \ 
+ glibc-source 
+
+RUN apt-get autoremove -y && \
+ apt-get autoclean -y && \
+ apt-get clean -y && \
+ rm -rf /var/lib/apt/lists/*
+
+ENV WRKSPCE="/workspace"
+
+RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+ && bash Miniconda3-latest-Linux-x86_64.sh -b -p $WRKSPCE/miniconda3 \
+ && rm -f Miniconda3-latest-Linux-x86_64.sh
+
+ENV PATH="$WRKSPCE/miniconda3/bin:${PATH}"
+
+RUN conda update -c defaults conda
+
+RUN conda create -n segment_anything_env python=3.9
+
+SHELL ["conda", "run", "-n", "segment_anything_env", "/bin/bash", "-c"]
+
+RUN git clone https://github.com/facebookresearch/segment-anything.git \
+ && cd segment-anything && pip install -e . \
+ && pip install opencv-python pycocotools matplotlib onnxruntime onnx

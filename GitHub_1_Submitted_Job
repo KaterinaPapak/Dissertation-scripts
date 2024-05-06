@@ -1,0 +1,62 @@
+####################
+#
+# SAM Experiments
+#
+####################
+
+#---------------------------------------------
+# Name your batch so it's easy to distinguish in the q.
+JobBatchName = "SAM interactive"
+
+# ---------------------------------------------------
+# Universe (vanilla, docker)
+universe = docker
+#docker_image = container-registry.surrey.ac.uk/shared-containers/raspectnn
+docker_image = container-registry.surrey.ac.uk/shared-containers/condor-sam-container:latest
+# --------------------------------------------
+# Executable and its arguments
+
+#environment = "mount=/vol/research/ap01718/"
+#arguments = -a - /vol/research/ap01718/corrected_rosbags/ /mnt/fast/nobackup/scratch4weeks/ct00659/vol/research/ap01718/CondorResults/
+#environment = "mount=/mnt/fast/nobackup/scratch4weeks/ct00659/contrast_stretch/"
+environment = "mount=/vol/research/ap01718/"
+executable = run.sh
+
+#loss_type = mrae
+#arguments = $(fart)
+# -------------------------------------------------
+
+# Event, out and error logs
+log = ./logs/$(cluster).$(process).log
+output = ./logs/$(cluster).$(process).out
+error = ./logs/$(cluster).$(process).error
+
+# -----------------------------------
+# File Transfer, Input, Output
+#should_transfer_files = YES
+
+# -------------------------------------
+# Requirements for the Job (Requirements are explained in further detail in example09.submit_file)
+#requirements = (CUDACapability >= 3.0) && (CUDAGlobalMemoryMb > 4500)
+#requirements = HasWeka
+
+# --------------------------------------
+# Resources
+request_GPUs = 1
+# this needs to be specified for the AI@Surrey cluster if requesting a GPU
+#+GPUMem = 24000
++GPUMem = 12000
+request_CPUs = 1
+#request_memory = 128000
+request_memory = 16G
+#64000
+
+#This job will complete in less than x hours
++JobRunTime = 2
+
+#This job can checkpoint
++CanCheckpoint = false
+
+# -----------------------------------
+# Queue commands
+queue 1
